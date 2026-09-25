@@ -11,6 +11,14 @@ const candidats = [
         partiPolitique : "Independant",
         age: 40,
         electeurs: ["ss","ss","ss","ss","ss"]
+    },
+    {
+        cin : "jc111",
+        nom : "ait",
+        prenom : "said",
+        partiPolitique : "Independant",
+        age: 25,
+        electeurs: ["ss","ss","ss","ss","ss","dd","kk"]
     }
 ];
 function menu(){
@@ -42,10 +50,10 @@ function menu(){
             Afficher();
             break
         case 4:
-            console.log("4");
+            vote();
             break
         case 5:
-            console.log("5");
+            update();
             break
         case 6:
             console.log("6");
@@ -68,6 +76,16 @@ menu();
 function Ajouter(){
     console.log("============== Ajouter un candidats =============")
     const cin = prompt("Entrez le CIN: ");
+    for(let con of candidats){
+        if(cin === con.cin){
+            console.log(`The CIN: ${con.cin} is already EXIST!!`);
+            const choix = prompt("Click Enter:");
+            switch(choix){
+                case '':
+                    menu();
+            }
+        }
+    }
     const nom = prompt("Entrez le Nom: ");
     const prenom = prompt("Entrez le Prenom: ");
     const partiPolitique = prompt("Entrez le Parti Politique (ou Indépendant): ");
@@ -84,6 +102,11 @@ function Ajouter(){
 
     candidats.push(candidat);
     // console.log(candidats)
+    const choix = prompt("To back to the Menu click Enter:");
+    switch(choix){
+        case '':
+            menu();
+    }
 
 }
 
@@ -91,7 +114,6 @@ function AjouterPlusieurs(){
     let manyCandidat;
     while(true){
         manyCandidat = parseInt(prompt("How Many condidats: "));
-        // console.log(typeof(Number))
         if(isNaN(manyCandidat) || manyCandidat <= 0){
             console.log("Enter Number!!");
         } else {
@@ -111,41 +133,111 @@ function AjouterPlusieurs(){
 }
 
 function Afficher(){
-    let vote = 0;
     if(!candidats){
         console.log("The list is Empty");
         return
     }
     console.log(`
-========  Sprt by  ========
-= 1 - Numbre of Vote      =
-= 2 - Unique candidats    =
-===========================
-        
+=========  Sprt by  ==========
+= 1 - By Numbre of Vote      =
+= 2 - By Unique candidats    =
+==============================
         `)
+    const choix = Number(prompt("Choose Sort way: "))
     switch(choix){
         case 1:
-            const unique = prompt("Unique candidats: ");
             for(let i = 0 ; i < candidats.length ; i++ ){
-                if(candidats[i].partiPolitique === unique){
-                    console.log(`${i+1} - Candidat name: ${candidats[i].prenom} ${candidats[i].nom} CIN: ${candidats[i].cin} Age: ${candidats[i].age} Politique: ${candidats[i].partiPolitique} Vote: ${vote}`);
+                // let vote = 0;
+                // for(let j = 0; j<candidats[i].electeurs.length; j++){
+                //     vote++
+                // }
+                for (let i = 0; i < candidats.length - 1; i++) {
+                    for (let j = 0; j < candidats.length - 1 - i; j++) {
+                        if (candidats[j].electeurs.length < candidats[j + 1].electeurs.length) {
+                            let x = candidats[j];
+                            candidats[j] = candidats[j + 1];
+                            candidats[j + 1] = x;
+                        }
+                    }
                 }
+                console.log(`${i+1} - Candidat name: ${candidats[i].nom} ${candidats[i].prenom} CIN: ${candidats[i].cin} Age: ${candidats[i].age} Politique: ${candidats[i].partiPolitique} Vote: ${candidats[i].electeurs.length}`);
             }
             break
         case 2:
+            const unique = prompt("Unique candidats: ");
             for(let i = 0 ; i < candidats.length ; i++ ){
-                for(let j = 0; j<candidats[i].electeurs.length; j++){
-                    vote++
+                if(candidats[i].partiPolitique === unique){
+                    console.log(`${i+1} - Candidat name: ${candidats[i].prenom} ${candidats[i].nom} CIN: ${candidats[i].cin} Age: ${candidats[i].age} Politique: ${candidats[i].partiPolitique} Vote: ${candidats[i].electeurs.length}`);
                 }
-                // console.log(vote)
-                console.log(`${i+1} - Candidat name: ${candidats[i].nom} ${candidats[i].prenom} CIN: ${candidats[i].cin} Age: ${candidats[i].age} Politique: ${candidats[i].partiPolitique} Vote: ${vote}`);
             }
             break
     }
-    const choix = prompt("To back to the Menu click Enter:");
-    switch(choix){
+    const backToMenu = prompt("To back to the Menu click Enter:");
+    switch(backToMenu){
         case '':
             menu();
     }
     
+}
+
+function vote(){
+    const voteCIN = prompt("Please write your CIN: ").trim();
+    for(let con of candidats){
+        for(let j = 0; j < con.electeurs.length; j++ ){
+            if(voteCIN === con.electeurs[j]){
+                console.log(`The CIN: ${con.cin} is already VOTE!! you can not change your vote!!.`);
+                const choix = prompt("Click Enter:");
+                switch(choix){
+                    case '':
+                        menu();
+                }
+            }
+        }
+    }
+    let cinOfCandidate = prompt("CIN of the candidate that you wanna VOTE for: ").trim();
+    let exist = false;
+    let candidatsName;
+    let indexCandidat;
+    for(let i = 0; i < candidats.length; i++){
+        if(cinOfCandidate === candidats[i].cin){
+            exist = true;
+            ChoosenCandidat = candidats[i];
+            break
+        }        
+    }
+
+    if(exist){
+        console.log("exist");
+        let vote = prompt(`Are you sure you wanna vote for ${ChoosenCandidat.nom} (Y/N): `).toLowerCase();
+        if(vote === "y" || vote === "" ){
+            ChoosenCandidat.electeurs.push(voteCIN);
+            const choix = prompt("Click Enter:");
+            switch(choix){
+                case '':
+                    menu();
+            }
+        } else {
+            menu();
+            return
+        }
+    } else {
+        console.log("The candidat do not exist");
+        const choix = prompt("Click Enter:");
+        switch(choix){
+            case '':
+                menu();
+        }
+    }
+    
+}
+
+function update(){
+    let cinOfCandidate = prompt("CIN of the candidate that you wanna UPDATE: ").trim();
+    for(let i = 0; i < candidats.length; i++){
+        if(cinOfCandidate === candidats[i].cin){
+            exist = true;
+            ChoosenCandidat = candidats[i];
+            break
+        }        
+    }
 }
